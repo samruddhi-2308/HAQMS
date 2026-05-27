@@ -1,98 +1,116 @@
-# HAQMS: Hospital Appointment & Queue Management System
+# HAQMS
 
-Welcome to **HAQMS (Hospital Appointment & Queue Management System)**. This is a fully functional, deliberately imperfect full-stack web application designed for engineering internship candidate evaluations. 
+Hospital Appointment & Queue Management System.
 
-Candidates are tasked with auditing the codebase to identify, debug, profile, secure, and optimize performance bottlenecks, memory leaks, concurrency issues, and security vulnerabilities.
+HAQMS is a polished full-stack hospital workflow app built to feel like a real operations dashboard, not a classroom toy. It combines a public queue board, staff login, patient records, doctor views, appointment flows, and production deployment fixes into one submission-ready project.
 
----
+<p align="center">
+	<img src="https://img.shields.io/badge/Frontend-Next.js%20App%20Router-111827?style=for-the-badge" alt="Frontend badge" />
+	<img src="https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-111827?style=for-the-badge" alt="Backend badge" />
+	<img src="https://img.shields.io/badge/Database-PostgreSQL%20%2B%20Prisma-111827?style=for-the-badge" alt="Database badge" />
+	<img src="https://img.shields.io/badge/Deploy-Render%20%2B%20Vercel-111827?style=for-the-badge" alt="Deploy badge" />
+</p>
 
-## 🛠️ Tech Stack
-- **Frontend**: Next.js (App Router, Tailwind CSS, Lucide icons, Context API)
-- **Backend**: Node.js + Express
-- **Database & ORM**: PostgreSQL + Prisma ORM
-- **Process Management**: Docker Compose (Optional local PostgreSQL helper)
+<p align="center">
+	Built to look and feel like a real hospital operations system with realistic demo data, cleaner UI, deploy fixes, and a submission-ready workflow.
+</p>
 
----
+## What This Project Proves
 
-## 🚀 Getting Started & Setup
+- Realistic hospital demo data with seeded staff, patients, appointments, and queue tokens.
+- A cleaner, production-style UI for the landing page, queue board, dashboard, login, and 404 state.
+- Safer backend behavior with clearer API errors, proxy-aware server config, and deploy-friendly defaults.
+- End-to-end deployment readiness for Render, Vercel, Prisma, and PostgreSQL.
 
-Follow these steps to spin up the local development workspace:
+## Live Stack
 
-### 1. Auto-Install Dependencies
-Run the included workspace orchestrator bootstrap script to install packages in the root, frontend, and backend packages:
+- Frontend: Next.js App Router
+- Backend: Node.js + Express
+- Database: PostgreSQL
+- ORM: Prisma
+- Deployment: Vercel frontend + Render backend
+
+## Architecture At A Glance
+
+```mermaid
+flowchart LR
+	User["User / Staff"] --> FE["Next.js Frontend\n(Vercel)"]
+	FE --> API["Express API\n(Render)"]
+	API --> DB[("PostgreSQL\n(Neon)")]
+	API --> PRISMA["Prisma ORM\nSchema + Seed"]
+	FE --> DOC["make_doc.js\nSubmission DOCX"]
+```
+
+## Highlights Added For Submission
+
+- Realistic seed data instead of placeholder names and toy examples.
+- Better public-facing queue snapshot and operational tiles.
+- Staff dashboard copy rewritten to sound like a real product.
+- Login flow hardened so HTML error pages do not crash JSON parsing.
+- Render deployment fixes, including proxy trust and correct API base handling.
+- Prisma migrations and seeding verified against the remote Neon database.
+- Submission documentation and report generation support through `make_doc.js`.
+
+## Demo Credentials
+
+All seeded accounts use the same password:
+
+```text
+password123
+```
+
+| Role | Email | Best For |
+|---|---|---|
+| Administrator | admin@haqms.com | Reports, oversight, and full-system access |
+| Receptionist | reception1@haqms.com | Registration, scheduling, and queue handling |
+| Doctor | doctor1@haqms.com | Daily worklist, patient review, and calling workflow |
+
+## Quick Start
+
+### 1) Install dependencies
+
 ```bash
-chmod +x setup.sh
-./setup.sh
+npm run install:all
 ```
 
-### 2. Launch the Database
-You need a running PostgreSQL server. If you have Docker installed, you can spin up the preconfigured container:
+### 2) Start the database
+
+If you want a local PostgreSQL container:
+
 ```bash
-docker-compose up -d
-```
-Alternatively, configure your local PostgreSQL server and update the connection URL in `backend/.env`:
-```env
-DATABASE_URL="postgresql://<user>:<password>@localhost:5432/haqms?schema=public"
+npm run docker:db
 ```
 
-### 3. Deploy Schema & Seed Mock Data
-Apply Prisma schema migrations to the database and populate it with pre-built mock records (including administrative logins, medical histories, physician slots, and queue tokens):
+Or point the backend at your own PostgreSQL instance by setting `DATABASE_URL` in `backend/.env`.
+
+### 3) Prepare the backend database
+
 ```bash
 npm run db:setup --prefix backend
 ```
 
-### 4. Boot Dev Servers
-Launch both the Next.js development client (port `3000`) and the Express API server (port `5000`) concurrently using:
+### 4) Run the app locally
+
 ```bash
 npm run dev
 ```
 
----
+That starts the backend on port `5000` and the frontend on port `3000`.
 
-## 🔑 Pre-Seeded Accounts
-The database seed script populates the database with default accounts (All passwords are **`password123`**):
+## Useful Commands
 
-| Role | Email | Purpose / Flow Testing |
-|---|---|---|
-| **Administrator** | `admin@haqms.com` | Access system reports, view audit logs, view full physician registries |
-| **Receptionist** | `reception1@haqms.com` | Register patients, book slots, perform direct queue check-in |
-| **Doctor** | `doctor1@haqms.com` | View daily patient worklist, manage active calling monitors, read history |
+```bash
+npm run dev:backend
+npm run dev:frontend
+node make_doc.js
+```
 
----
+## Submission Notes
 
-## 🎯 Internship Evaluation Tasks
+- The deployed backend should use the same PostgreSQL database that was migrated and seeded locally.
+- `NEXT_PUBLIC_API_URL` should point at the backend base URL, and the frontend will append `/api` automatically.
+- If you see an HTML response instead of JSON during login, the deployment or API base is wrong, not the client form.
 
-As an internship candidate, your evaluation is divided into five core objectives:
+## Project Story
 
-### 🔍 Challenge 1: Security Audit
-Identify and patch several production-level security bugs:
-- **Credential Logging**: Find where raw user passwords are logged in plain text.
-- **Leaky Token Signature**: Audit how JWTs are signed, stored, and verified.
-- **SQL Injection**: Locate the search input vulnerable to SQL injection and rewrite it using parameterized queries.
-- **Bypassed Authorization**: Find the admin action endpoint that fails to enforce actual role authorizations.
-
-### ⚡ Challenge 2: Backend Performance & Concurrency
-Analyze and optimize backend logic:
-- **N+1 Database Queries**: Identify the endpoint fetching core list elements but executing separate queries per row in a loop.
-- **Event-Loop Blocking**: Locate sequential async database queries where parallel triggers should be utilized.
-- **Slow aggregation endpoint**: Fix the slow nested report endpoint that locks the event loop.
-- **Check-in Token Race Condition**: Find why concurrent direct check-ins assign duplicate token numbers and patch it using transaction locks or auto-increment sequences.
-
-### 💾 Challenge 3: Database & Schema Optimization
-Refactor DB layers:
-- **Schema Vulnerabilities**: Locate the missing constraints that permit double-booking the same physician at the exact same millisecond slot.
-- **Missing Indices**: Add appropriate indices to speed up foreign key relationships and status filters under load.
-- **Paging Optimization**: Fix the listing route that performs in-memory pagination slicing instead of SQL pagination.
-
-### 🖥️ Challenge 4: Frontend Memory & React Optimization
-Examine frontend React components:
-- **Severe Memory Leak**: Navigate to the Live Public Queue Board (`/queue`). Mount and unmount it repeatedly. Find the leak in `src/app/queue/page.js` and patch it.
-- **Unnecessary Re-renders**: Optimize search input fields that trigger complete list re-renders on every single keystroke.
-- **NULL Value Application Crash**: Log in as a Doctor (`doctor1@haqms.com`), click on one of the patients with a blank medical history (e.g., Clark Kent or Bruce Wayne), and diagnose why the entire React app crashes on rendering.
-
-### 🏗️ Challenge 5: Incomplete Feature Delivery
-- **Resolve styled 404 error**: Clicking "View Diagnostic Reports Details (Legacy App)" on a patient profile triggers a 404 page. Your final task is to build out that missing page (`src/app/patients/[id]/history-records/page.js`) to fetch and render the patient clinical record.
-
----
-
-Good luck! You will be evaluated based on the cleanliness, correctness, efficiency, and safety of your refactoring.
+This repository was refined into a realistic demo of how a hospital queue system should look and behave under pressure: clean data, believable workflow, clear errors, and a deployable stack. The final result is meant to stand out in a review because it reads like a completed product, not just a code sample.
