@@ -5,6 +5,14 @@ import { useRouter } from 'next/navigation';
 
 const AuthContext = createContext();
 
+const getNetworkErrorMessage = (err) => {
+  if (err instanceof TypeError && err.message === 'Failed to fetch') {
+    return 'Could not connect to the backend API. Please check that the backend is running on port 5000.';
+  }
+
+  return err.message || 'Something went wrong. Please try again.';
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
@@ -63,9 +71,10 @@ export const AuthProvider = ({ children }) => {
       router.push('/dashboard');
       return { success: true };
     } catch (err) {
-      console.error('[AUTH-ERROR] Login request failed:', err);
-      setError(err.message);
-      return { success: false, error: err.message };
+      const message = getNetworkErrorMessage(err);
+      console.warn('[AUTH] Login request failed:', message);
+      setError(message);
+      return { success: false, error: message };
     } finally {
       setLoading(false);
     }
@@ -94,8 +103,9 @@ export const AuthProvider = ({ children }) => {
       // we can trigger login for them.
       return login(email, password);
     } catch (err) {
-      setError(err.message);
-      return { success: false, error: err.message };
+      const message = getNetworkErrorMessage(err);
+      setError(message);
+      return { success: false, error: message };
     } finally {
       setLoading(false);
     }

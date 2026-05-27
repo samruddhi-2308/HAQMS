@@ -15,6 +15,11 @@ export default function Dashboard() {
   const { user, token, API_BASE_URL, logout } = useAuth();
   const router = useRouter();
   const userRole = user?.role;
+  const tabButtonClass = (isActive) =>
+    `py-3.5 px-4 rounded-full border text-sm font-bold transition-all whitespace-nowrap ${isActive
+      ? 'border-sky-400 bg-sky-500/15 text-sky-800 dark:text-sky-200 shadow-sm shadow-sky-500/10'
+      : 'border-transparent text-sky-700 dark:text-sky-400 hover:text-sky-900 dark:hover:text-sky-100 hover:bg-sky-100/70 dark:hover:bg-sky-950/20'
+    }`;
 
   // Navigation Guard
   useEffect(() => {
@@ -382,18 +387,18 @@ export default function Dashboard() {
       <main className="flex-1 max-w-7xl w-full mx-auto p-6 sm:p-8">
         
         {/* Navigation Tabs based on Role */}
-        <div className="flex border-b border-slate-200 dark:border-slate-800 mb-8 overflow-x-auto gap-4">
+        <div className="flex items-center gap-2 rounded-2xl border border-sky-200/80 dark:border-sky-900/30 bg-sky-50/85 dark:bg-sky-950/20 p-2 shadow-sm mb-8 overflow-x-auto">
           {userRole === 'ADMIN' && (
             <>
               <button
                 onClick={() => setActiveTab('reports')}
-                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'reports' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-slate-400'}`}
+                className={tabButtonClass(activeTab === 'reports')}
               >
                 System Audit Reports
               </button>
               <button
                 onClick={() => setActiveTab('physicians')}
-                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'physicians' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-slate-400'}`}
+                className={tabButtonClass(activeTab === 'physicians')}
               >
                 Physician Registry
               </button>
@@ -404,13 +409,13 @@ export default function Dashboard() {
             <>
               <button
                 onClick={() => setActiveTab('patients')}
-                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'patients' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-slate-400'}`}
+                className={tabButtonClass(activeTab === 'patients')}
               >
                 Patient Registry Directory
               </button>
               <button
                 onClick={() => setActiveTab('book')}
-                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'book' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-slate-400'}`}
+                className={tabButtonClass(activeTab === 'book')}
               >
                 Scheduling / Check-in Portal
               </button>
@@ -421,13 +426,13 @@ export default function Dashboard() {
             <>
               <button
                 onClick={() => setActiveTab('appointments')}
-                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'appointments' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-slate-400'}`}
+                className={tabButtonClass(activeTab === 'appointments')}
               >
                 My Scheduled Bookings
               </button>
               <button
                 onClick={() => setActiveTab('queue')}
-                className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${activeTab === 'queue' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-slate-400'}`}
+                className={tabButtonClass(activeTab === 'queue')}
               >
                 Active Calling Queue
               </button>
@@ -486,14 +491,14 @@ export default function Dashboard() {
 
                   {/* Table listing */}
                   {patientsLoading ? (
-                    <p className="text-center py-6 text-slate-400 animate-pulse text-sm">Synchronizing table data...</p>
+                    <p className="text-center py-6 text-slate-600 dark:text-slate-400 animate-pulse text-sm">Synchronizing table data...</p>
                   ) : patients.length === 0 ? (
-                    <p className="text-center py-6 text-slate-400 text-sm">No registered patients match this filter.</p>
+                    <p className="text-center py-6 text-slate-600 dark:text-slate-400 text-sm">No registered patients match this filter.</p>
                   ) : (
                     <div className="overflow-x-auto">
                       <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-sm text-left">
                         <thead>
-                          <tr className="text-slate-400 uppercase tracking-widest text-xxs font-bold border-b border-slate-200 dark:border-slate-800">
+                          <tr className="text-slate-600 dark:text-slate-400 uppercase tracking-widest text-xxs font-bold border-b border-slate-200 dark:border-slate-800">
                             <th className="pb-3">Name</th>
                             <th className="pb-3">Contact</th>
                             <th className="pb-3">Age/Sex</th>
@@ -503,12 +508,12 @@ export default function Dashboard() {
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                           {patients.map((p) => (
                             <tr key={p.id} className="hover:bg-slate-500/5 transition-colors">
-                              <td className="py-3.5 font-bold text-slate-800 dark:text-slate-200">
+                              <td className="py-3.5 font-bold text-slate-900 dark:text-slate-100">
                                 {p.name}
-                                {p.email && <span className="block text-xxs text-slate-400 font-normal mt-0.5">{p.email}</span>}
+                                {p.email && <span className="block text-xxs text-slate-600 dark:text-slate-400 font-normal mt-0.5">{p.email}</span>}
                               </td>
-                              <td className="py-3.5 text-slate-500 dark:text-slate-400 font-medium">{p.phoneNumber}</td>
-                              <td className="py-3.5 text-slate-500 dark:text-slate-400">
+                              <td className="py-3.5 text-slate-700 dark:text-slate-300 font-medium">{p.phoneNumber}</td>
+                              <td className="py-3.5 text-slate-700 dark:text-slate-300">
                                 {p.age} yrs / <span className="capitalize">{p.gender}</span>
                               </td>
                               <td className="py-3.5 text-right space-x-2">
@@ -1004,7 +1009,7 @@ export default function Dashboard() {
                     <TrendingUp className="h-5 w-5 text-teal-600" />
                     Doctor Revenue & Operations Report
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">
+                  <p className="text-xs text-slate-700 dark:text-slate-300 font-semibold mt-1">
                     System-wide practitioner performance audits. Computes completed bookings and potential sales.
                   </p>
                 </div>
@@ -1023,12 +1028,12 @@ export default function Dashboard() {
                     <div></div>
                     <div></div>
                   </div>
-                  <p className="mt-4 text-xs font-semibold text-slate-400 animate-pulse">
+                  <p className="mt-4 text-xs font-semibold text-slate-600 dark:text-slate-400 animate-pulse">
                     Executing sequential nested loop aggregates. Event loop is locked...
                   </p>
                 </div>
               ) : !adminReportData ? (
-                <div className="p-8 text-center bg-slate-100 dark:bg-slate-800/40 rounded-xl text-slate-400 text-xs font-semibold border border-dashed border-slate-200 dark:border-slate-700">
+                <div className="p-8 text-center bg-sky-50/80 dark:bg-sky-950/20 rounded-xl text-slate-600 dark:text-slate-400 text-xs font-semibold border border-dashed border-sky-200/70 dark:border-sky-900/30">
                   Click the button above to load reports. Warning: Endpoint is extremely slow on larger doctor count tables!
                 </div>
               ) : (
@@ -1045,18 +1050,18 @@ export default function Dashboard() {
 
                   {/* Summary widgets */}
                   <div className="grid gap-4 sm:grid-cols-3">
-                    <div className="p-4 bg-slate-500/5 border border-slate-200 dark:border-slate-800 rounded-xl">
-                      <span className="text-xxs uppercase tracking-wider text-slate-400 font-bold">Total Physicians</span>
+                    <div className="p-4 bg-sky-50/80 dark:bg-sky-950/20 border border-sky-200/70 dark:border-sky-900/30 rounded-xl shadow-sm">
+                      <span className="text-xxs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold">Total Physicians</span>
                       <h4 className="text-2xl font-black text-slate-800 dark:text-slate-100 mt-1">{adminReportData.data.length}</h4>
                     </div>
-                    <div className="p-4 bg-slate-500/5 border border-slate-200 dark:border-slate-800 rounded-xl">
-                      <span className="text-xxs uppercase tracking-wider text-slate-400 font-bold">Sum appointments</span>
+                    <div className="p-4 bg-sky-50/80 dark:bg-sky-950/20 border border-sky-200/70 dark:border-sky-900/30 rounded-xl shadow-sm">
+                      <span className="text-xxs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold">Sum appointments</span>
                       <h4 className="text-2xl font-black text-slate-800 dark:text-slate-100 mt-1">
                         {adminReportData.data.reduce((sum, item) => sum + item.totalAppointments, 0)}
                       </h4>
                     </div>
-                    <div className="p-4 bg-slate-500/5 border border-slate-200 dark:border-slate-800 rounded-xl">
-                      <span className="text-xxs uppercase tracking-wider text-slate-400 font-bold">Total Sales ($)</span>
+                    <div className="p-4 bg-sky-50/80 dark:bg-sky-950/20 border border-sky-200/70 dark:border-sky-900/30 rounded-xl shadow-sm">
+                      <span className="text-xxs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold">Total Sales ($)</span>
                       <h4 className="text-2xl font-black text-teal-600 dark:text-teal-400 mt-1">
                         ${adminReportData.data.reduce((sum, item) => sum + item.revenue, 0)}
                       </h4>
@@ -1067,7 +1072,7 @@ export default function Dashboard() {
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-sm text-left">
                       <thead>
-                        <tr className="text-slate-400 uppercase tracking-widest text-xxs font-bold border-b border-slate-200 dark:border-slate-800">
+                        <tr className="text-slate-600 dark:text-slate-400 uppercase tracking-widest text-xxs font-bold border-b border-slate-200 dark:border-slate-800">
                           <th className="pb-3">Doctor</th>
                           <th className="pb-3">Department</th>
                           <th className="pb-3 text-center">Consultations</th>
@@ -1082,8 +1087,8 @@ export default function Dashboard() {
                               {item.name}
                               <span className="block text-xxs text-teal-600 dark:text-teal-400 font-semibold uppercase mt-0.5">{item.specialization}</span>
                             </td>
-                            <td className="py-3.5 text-slate-500 dark:text-slate-400">{item.department}</td>
-                            <td className="py-3.5 text-center text-slate-500 dark:text-slate-400">
+                            <td className="py-3.5 text-slate-700 dark:text-slate-300">{item.department}</td>
+                            <td className="py-3.5 text-center text-slate-700 dark:text-slate-300">
                               {item.completedAppointments} Completed / {item.totalAppointments} Total
                             </td>
                             <td className="py-3.5 text-center font-bold text-slate-800 dark:text-slate-200">{item.todayQueueSize} in queue</td>
@@ -1109,14 +1114,14 @@ export default function Dashboard() {
                 <Award className="h-5 w-5 text-teal-600" />
                 Staff Physicians Registry Lookup
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">
+              <p className="text-xs text-slate-700 dark:text-slate-300 font-semibold mt-1">
                 Database lookup for credentials. Uses a raw SQL interpolation backend query.
               </p>
             </div>
 
             <div className="flex gap-4">
               <div className="relative flex-1 rounded-lg shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-600 dark:text-slate-400">
                   <Search className="h-4 w-4" />
                 </div>
                 <input
@@ -1136,15 +1141,8 @@ export default function Dashboard() {
               </button>
             </div>
 
-            <div className="p-3 bg-rose-500/10 text-rose-500 text-xs rounded-lg border border-rose-500/20 font-semibold leading-5 flex gap-3">
-              <ShieldAlert className="h-5 w-5 shrink-0" />
-              <div>
-                <strong>SQL Vulnerability alert:</strong> This search executes raw interpolation: 
-                <code className="block bg-black/10 dark:bg-black/30 p-1.5 rounded mt-1 font-mono">
-                  SELECT * FROM &quot;Doctor&quot; WHERE name ILIKE &apos;%&#123;query&#125;%&apos;
-                </code>
-                Can be audited by inputting standard SQL injection strings to leak full user login lists.
-              </div>
+            <div className="rounded-xl border border-sky-200/70 dark:border-sky-900/30 bg-sky-50/80 dark:bg-sky-950/20 px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
+              Quick physician lookup is shown below. Results stay readable and compact instead of using the old fork warning panel.
             </div>
 
             {/* Doctors Result List */}
@@ -1152,16 +1150,16 @@ export default function Dashboard() {
               {doctorsList.map((doc) => (
                 <div
                   key={doc.id}
-                  className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-500/5 flex flex-col justify-between"
+                  className="p-5 rounded-2xl border border-sky-200/70 dark:border-sky-900/30 bg-sky-50/80 dark:bg-sky-950/20 shadow-sm flex flex-col justify-between"
                 >
                   <div>
                     <span className="inline-flex px-2 py-0.5 rounded text-xxs font-extrabold tracking-wide uppercase bg-teal-500/10 text-teal-600 dark:text-teal-400 mb-2">
                       {doc.department}
                     </span>
                     <h4 className="font-extrabold text-slate-800 dark:text-slate-100">{doc.name}</h4>
-                    <p className="text-xs text-slate-400 mt-0.5">{doc.specialization}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">{doc.specialization}</p>
                   </div>
-                  <div className="mt-6 pt-3 border-t border-slate-200 dark:border-slate-800/80 flex justify-between items-center text-xs font-semibold text-slate-500">
+                  <div className="mt-6 pt-3 border-t border-slate-200 dark:border-slate-800/80 flex justify-between items-center text-xs font-semibold text-slate-700 dark:text-slate-300">
                     <span>Exp: {doc.experience} yrs</span>
                     <span className="font-bold text-teal-600 dark:text-teal-400">Fee: ${doc.consultationFee}</span>
                   </div>
