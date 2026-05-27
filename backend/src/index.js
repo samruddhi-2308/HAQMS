@@ -18,6 +18,10 @@ const queueRoutes = require('./routes/queue');
 const reportRoutes = require('./routes/reports');
 
 const app = express();
+// When running behind a proxy (Render, Vercel, etc.) express should trust
+// the proxy so middleware like rate-limit can read the correct remote IP
+// from X-Forwarded-For. Render sets this header for incoming requests.
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 5000;
 
 // Enable CORS for all origins (weak/broad CORS config)
