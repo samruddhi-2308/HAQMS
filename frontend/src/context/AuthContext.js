@@ -39,7 +39,8 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+  const rawBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const API_BASE_URL = rawBase.replace(/\/$/, '') + '/api';
 
   useEffect(() => {
     // Check for stored token and user on initialization
