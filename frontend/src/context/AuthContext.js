@@ -13,6 +13,25 @@ const getNetworkErrorMessage = (err) => {
   return err.message || 'Something went wrong. Please try again.';
 };
 
+const readJsonResponse = async (response, fallbackMessage) => {
+  const contentType = response.headers.get('content-type') || '';
+  const bodyText = await response.text();
+
+  if (!contentType.includes('application/json')) {
+    throw new Error(
+      `${fallbackMessage} The backend returned ${response.status} ${response.statusText} instead of JSON. Check NEXT_PUBLIC_API_URL and the Render deployment.`
+    );
+  }
+
+  try {
+    return bodyText ? JSON.parse(bodyText) : {};
+  } catch {
+    throw new Error(
+      `${fallbackMessage} The backend returned malformed JSON. Check NEXT_PUBLIC_API_URL and the Render deployment.`
+    );
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
@@ -51,7 +70,7 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      const data = await readJsonResponse(response, 'Authentication failed.');
 
       if (!response.ok) {
         throw new Error(data.error || 'Authentication failed');
@@ -91,7 +110,7 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ name, email, password, role }),
       });
 
-      const data = await response.json();
+      const data = await readJsonResponse(response, 'Registration failed.');
 
       if (!response.ok) {
         throw new Error(data.error || 'Registration failed');
