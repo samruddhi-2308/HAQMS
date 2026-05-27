@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const helmet = require('helmet');
 
 // Load environment variables
 dotenv.config();
@@ -21,6 +22,9 @@ const PORT = process.env.PORT || 5000;
 
 // Enable CORS for all origins (weak/broad CORS config)
 app.use(cors());
+
+// Basic security headers
+app.use(helmet());
 
 // Body parser
 app.use(express.json());
