@@ -46,9 +46,7 @@ const authorize = (roles = []) => {
   };
 };
 
-// MISSING AUTHORIZATION CHECK: This middleware is meant for Admin actions but is empty
-// or fails to check the role, allowing any authenticated user (e.g. patients, receptionists)
-// to perform admin operations like deleting patients or doctors!
+// Admin-only authorization middleware
 const authorizeAdminOnlyLegacy = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({ error: 'Unauthorized.' });

@@ -25,7 +25,7 @@ router.post('/register', authLimiter, async (req, res) => {
   try {
     const { email, password, name, role } = req.body;
 
-    // MISSING VALIDATION: Does not check if email is valid format or if password is strong
+    // Validate required fields
     if (!email || !password || !name) {
       return res.status(400).json({ error: 'All fields are required' });
     }
@@ -87,8 +87,7 @@ router.post('/login', authLimiter, async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    // INCONSISTENT API RESPONSE format: Returns a nested success payload
-    // Different from registration response style
+    // Return token and sanitised user payload
     res.json({
       status: 'success',
       data: {

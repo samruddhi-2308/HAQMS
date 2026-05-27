@@ -18,14 +18,10 @@ export default function NotFound() {
           </div>
           
           <h2 className="text-4xl font-black text-slate-800 dark:text-slate-100">404</h2>
-          <h3 className="mt-2 text-xl font-bold text-slate-800 dark:text-slate-100">
-            Page Not Found / Incomplete
-          </h3>
+          <h3 className="mt-2 text-xl font-bold text-slate-800 dark:text-slate-100">Page unavailable</h3>
           
           <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
-            <strong>Candidate Mission Note:</strong> This route is deliberately left incomplete! 
-            Clicking a &ldquo;View Medical Records&rdquo; link triggers this 404. 
-            Your task might include building the missing page component to fetch and render patient records.
+            The page you tried to open may have moved, expired, or is not available to your account.
           </p>
 
           <div className="mt-8">

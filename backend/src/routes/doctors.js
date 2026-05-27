@@ -69,9 +69,8 @@ router.get('/stats', authenticate, async (req, res) => {
         averageFee: Math.round(averageFee._avg.consultationFee || 0),
         maxExperience: highestExperience._max.experience || 0,
       },
-      debugInfo: {
+      meta: {
         executionTimeMs: durationMs,
-        notes: 'Loaded sequentially for safety. Optimization needed.'
       }
     });
   } catch (error) {

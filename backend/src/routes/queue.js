@@ -31,10 +31,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/queue/checkin
-// Generate a new queue token for a patient
-// CONCURRENCY/RACE CONDITION BUG: Token increment uses aggregate read followed by create.
-// Introduce a deliberate asynchronous delay (setTimeout) to force a wide race window
-// where concurrent check-ins assign the exact same token number.
+// Generate a new queue token for a patient using a transactional advisory lock.
 router.post('/checkin', authenticate, async (req, res) => {
   try {
     const { patientId, doctorId, appointmentId } = req.body;

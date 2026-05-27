@@ -78,6 +78,12 @@ model Appointment {
   queueTokens     QueueToken[]
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
+  @@unique([doctorId, appointmentDate])
+  @@index([doctorId])
+  @@index([patientId])
+  @@index([status])
+  @@index([doctorId, status])
 }
 
 model QueueToken {
@@ -92,4 +98,8 @@ model QueueToken {
   appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+
+  @@index([doctorId])
+  @@index([status])
+  @@index([doctorId, createdAt])
 }

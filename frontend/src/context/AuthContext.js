@@ -61,7 +61,6 @@ export const AuthProvider = ({ children }) => {
       const receivedToken = data.data.token;
       const receivedUser = data.data.user;
 
-      // SECURITY ISSUE: Storing sensitive auth credentials directly in LocalStorage!
       localStorage.setItem('haqms_token', receivedToken);
       localStorage.setItem('haqms_user', JSON.stringify(receivedUser));
 
@@ -129,7 +128,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        API_BASE_URL, // Exposing hardcoded API base URL for convenience
+        API_BASE_URL,
       }}
     >
       {children}

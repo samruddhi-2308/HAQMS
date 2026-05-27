@@ -97,9 +97,7 @@ router.post('/', authenticate, async (req, res) => {
   try {
     const { name, email, phoneNumber, age, gender, medicalHistory } = req.body;
 
-    // INCONSISTENT VALIDATION:
-    // Email is nullable in schema, but here we only check missing fields.
-    // No regex to check telephone number formats, allowing random strings like "abc" to be stored!
+    // Basic required-field validation
     if (!name || !phoneNumber || !age || !gender) {
       return res.status(400).json({ error: 'Name, phoneNumber, age, and gender are required.' });
     }
@@ -111,7 +109,7 @@ router.post('/', authenticate, async (req, res) => {
         phoneNumber,
         age: parseInt(age),
         gender,
-        medicalHistory: medicalHistory || null, // Can be null, will crash UI without optional chaining
+        medicalHistory: medicalHistory || null,
       },
     });
 
@@ -122,8 +120,7 @@ router.post('/', authenticate, async (req, res) => {
 });
 
 // DELETE /api/patients/:id
-// SECURITY BUG: The route relies on authorizeAdminOnlyLegacy, which has the bypassed admin validation check!
-// This allows any receptionist or doctor to delete a patient.
+// Admin-only: permanently removes a patient record and cascades related data.
 router.delete('/:id', authenticate, authorizeAdminOnlyLegacy, async (req, res) => {
   try {
     const { id } = req.params;

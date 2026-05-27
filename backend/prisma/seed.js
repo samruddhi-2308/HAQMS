@@ -41,7 +41,7 @@ async function main() {
     data: {
       email: 'doctor1@haqms.com',
       password: hashedPassword,
-      name: 'Dr. Meredith Grey',
+      name: 'Dr. Amina Rahman',
       role: UserRole.DOCTOR,
     },
   });
@@ -49,7 +49,7 @@ async function main() {
   const doctorOne = await prisma.doctor.create({
     data: {
       userId: doctorUser.id,
-      name: 'Dr. Meredith Grey',
+      name: 'Dr. Amina Rahman',
       specialization: 'Cardiothoracic Surgery',
       department: 'Surgery',
       experience: 12,
@@ -59,7 +59,7 @@ async function main() {
 
   const doctorTwo = await prisma.doctor.create({
     data: {
-      name: 'Dr. Stephen Strange',
+      name: 'Dr. Daniel Park',
       specialization: 'Neurology',
       department: 'Medicine',
       experience: 18,
@@ -69,7 +69,7 @@ async function main() {
 
   const doctorThree = await prisma.doctor.create({
     data: {
-      name: 'Dr. Dana Scully',
+      name: 'Dr. Priya Nair',
       specialization: 'Internal Medicine',
       department: 'General Medicine',
       experience: 10,
@@ -80,18 +80,18 @@ async function main() {
   const patients = await Promise.all([
     prisma.patient.create({
       data: {
-        name: 'Clark Kent',
-        email: 'clark.kent@dailyplanet.com',
+        name: 'Nadia Shah',
+        email: 'nadia.shah@example.com',
         phoneNumber: '555-0101',
         age: 35,
-        gender: 'Male',
+        gender: 'Female',
         medicalHistory: null,
       },
     }),
     prisma.patient.create({
       data: {
-        name: 'Bruce Wayne',
-        email: 'bruce@wayne.com',
+        name: 'Omar Hassan',
+        email: 'omar.hassan@example.com',
         phoneNumber: '555-0199',
         age: 42,
         gender: 'Male',
@@ -100,8 +100,8 @@ async function main() {
     }),
     prisma.patient.create({
       data: {
-        name: 'Diana Prince',
-        email: 'diana.prince@themyscira.com',
+        name: 'Elena Torres',
+        email: 'elena.torres@example.com',
         phoneNumber: '555-0112',
         age: 33,
         gender: 'Female',
@@ -110,8 +110,8 @@ async function main() {
     }),
     prisma.patient.create({
       data: {
-        name: 'Peter Parker',
-        email: 'peter.parker@dailybugle.com',
+        name: 'Lucas Miller',
+        email: 'lucas.miller@example.com',
         phoneNumber: '555-0144',
         age: 25,
         gender: 'Male',
@@ -120,22 +120,22 @@ async function main() {
     }),
     prisma.patient.create({
       data: {
-        name: 'Tony Stark',
-        email: 'tony.stark@starkindustries.com',
+        name: 'Fatima Khan',
+        email: 'fatima.khan@example.com',
         phoneNumber: '555-0155',
         age: 48,
-        gender: 'Male',
+        gender: 'Female',
         medicalHistory: 'Post-operative cardiology review.',
       },
     }),
     prisma.patient.create({
       data: {
-        name: 'Natasha Romanoff',
-        email: 'natasha.romanoff@shield.gov',
+        name: 'Sophia Bennett',
+        email: 'sophia.bennett@example.com',
         phoneNumber: '555-0166',
         age: 36,
         gender: 'Female',
-        medicalHistory: 'Routine consultation.',
+        medicalHistory: 'Routine consultation and lab review.',
       },
     }),
   ]);
@@ -148,7 +148,7 @@ async function main() {
         patientId: patients[0].id,
         doctorId: doctorOne.id,
         appointmentDate: shiftDate(1, 9, 0),
-        reason: 'General checkup',
+        reason: 'Annual cardiac review',
         status: AppointmentStatus.PENDING,
       },
     })
@@ -196,7 +196,7 @@ async function main() {
         patientId: patients[4].id,
         doctorId: doctorThree.id,
         appointmentDate: shiftDate(1, 11, 0),
-        reason: 'Cardio follow-up',
+        reason: 'Cardiology follow-up',
         status: AppointmentStatus.PENDING,
       },
     })

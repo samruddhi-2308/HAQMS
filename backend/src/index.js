@@ -52,14 +52,11 @@ app.get('/', (req, res) => {
   });
 });
 
-// GLOBAL ERROR HANDLER
-// BUG: Improper error handling. It returns the raw error stack trace to the client,
-// which leaks details about database types, schema layout, and file paths.
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('[CRITICAL-ERROR]:', err);
   res.status(500).json({
-    message: 'An unexpected internal server error occurred!',
-    error: err.message,
+    message: 'An unexpected internal server error occurred.',
   });
 });
 
@@ -71,8 +68,6 @@ app.listen(PORT, () => {
   console.log(`===================================================`);
 });
 
-// Catch unhandled rejections
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  // Intentionally do not exit process so candidates see unhandled promise logs
 });

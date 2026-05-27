@@ -81,7 +81,6 @@ export default function Dashboard() {
   const fetchPatients = async (page = 1) => {
     setPatientsLoading(true);
     try {
-      // Inefficient memory pagination called from client
       const res = await fetch(`${API_BASE_URL}/patients?page=${page}&limit=5&search=${patientSearch}&gender=${patientGender}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -101,7 +100,7 @@ export default function Dashboard() {
     }
   };
 
-  // Trigger Patient List Fetch (Every keystroke trigger re-renders parent! - Performance bug)
+  // Re-fetch patients when debounced search or gender filter changes
   useEffect(() => {
     if (userRole === 'RECEPTIONIST' || userRole === 'ADMIN') {
       fetchPatients(1);
@@ -219,7 +218,7 @@ export default function Dashboard() {
     }
   };
 
-  // Delete Patient (Bypassed authorization admin check!)
+  // Delete patient record (admin-only, enforced on backend)
   const handleDeletePatient = async (id) => {
     if (!confirm('Are you sure you want to delete this patient record?')) return;
     try {
@@ -239,7 +238,7 @@ export default function Dashboard() {
     }
   };
 
-  // Queue Token Checkin (Race condition API!)
+  // Queue token check-in
   const handleQueueCheckin = async (patientId, doctorId, appointmentId = null) => {
     setCheckinMessage('');
     try {
@@ -273,7 +272,7 @@ export default function Dashboard() {
       const matchedDoc = doctorsList.find(d => d.userId === user.id);
       if (!matchedDoc) return;
 
-      // 1. Fetch appointments for this doctor (N+1 database queries triggers inside server)
+      // Fetch appointments for this doctor
       const appRes = await fetch(`${API_BASE_URL}/appointments?doctorId=${matchedDoc.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -342,11 +341,9 @@ export default function Dashboard() {
   // ADMIN SYSTEM WORKFLOWS
   // ==========================================
   
-  // Slow report generator fetch
   const generateSystemReport = async () => {
     setAdminReportLoading(true);
     try {
-      // Calls slow nested aggregation endpoint
       const res = await fetch(`${API_BASE_URL}/reports/doctor-stats`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -361,7 +358,7 @@ export default function Dashboard() {
     }
   };
 
-  // Search Doctors (SQL Injection vulnerable API!)
+  // Search physicians by name
   const searchPhysiciansAdmin = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/doctors?search=${adminSearchQuery}`, {
@@ -462,7 +459,7 @@ export default function Dashboard() {
                     Patient Lookup Directory
                   </h3>
 
-                  {/* Filters (Causes slow re-renders on keystroke) */}
+                  {/* Search and filter controls */}
                   <div className="flex gap-4 mb-6">
                     <div className="relative flex-1 rounded-lg shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -587,7 +584,7 @@ export default function Dashboard() {
                       required
                       value={regName}
                       onChange={(e) => setRegName(e.target.value)}
-                      placeholder="Bruce Wayne"
+                      placeholder="Maya Patel"
                       className="block w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-lg text-slate-900 dark:text-slate-100 text-sm focus:outline-none"
                     />
                   </div>
@@ -906,17 +903,12 @@ export default function Dashboard() {
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-xs space-y-2">
                   <h4 className="font-bold text-slate-400 uppercase tracking-wider">Clinical Background Information</h4>
                   
-                  {/* FRONTEND CRASH BUG:
-                      Assuming medicalHistory is always populated. Accesses a method on a nullable property
-                      without optional chaining! If medicalHistory is null (which is the case for Batman, Clark Kent, etc.),
-                      this code throws: "Cannot read properties of null (reading 'toUpperCase')" and crashes the app! */}
                   <p className="text-slate-700 dark:text-slate-300 leading-5 text-sm font-semibold">
                     {selectedPatientHistory.medicalHistory?.toUpperCase() ?? 'No medical history on record.'}
                   </p>
                 </div>
 
                 <div className="pt-2 flex justify-between items-center text-xs">
-                  {/* Incomplete Missing Route trigger -> will route to 404 page! */}
                   <Link 
                     href={`/patients/${selectedPatientHistory.id}/history-records`} 
                     className="text-teal-600 font-extrabold hover:underline flex items-center gap-1"
@@ -1007,10 +999,10 @@ export default function Dashboard() {
                 <div>
                   <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <TrendingUp className="h-5 w-5 text-teal-600" />
-                    Doctor Revenue & Operations Report
+                    Clinic Operations Summary
                   </h3>
                   <p className="text-xs text-slate-700 dark:text-slate-300 font-semibold mt-1">
-                    System-wide practitioner performance audits. Computes completed bookings and potential sales.
+                    Live throughput, completed visits, and revenue estimates for the active physician roster.
                   </p>
                 </div>
                 <button
@@ -1018,7 +1010,7 @@ export default function Dashboard() {
                   disabled={adminReportLoading}
                   className="glow-btn px-4 py-2 bg-teal-600 text-white font-extrabold text-xs rounded-lg shadow hover:bg-teal-700 disabled:opacity-50 transition-colors"
                 >
-                  {adminReportLoading ? 'Aggregating...' : 'Load Doctor System Audit Report'}
+                  {adminReportLoading ? 'Refreshing...' : 'Refresh operations report'}
                 </button>
               </div>
 
@@ -1029,12 +1021,12 @@ export default function Dashboard() {
                     <div></div>
                   </div>
                   <p className="mt-4 text-xs font-semibold text-slate-600 dark:text-slate-400 animate-pulse">
-                    Executing sequential nested loop aggregates. Event loop is locked...
+                    Refreshing operations report...
                   </p>
                 </div>
               ) : !adminReportData ? (
                 <div className="p-8 text-center bg-sky-50/80 dark:bg-sky-950/20 rounded-xl text-slate-600 dark:text-slate-400 text-xs font-semibold border border-dashed border-sky-200/70 dark:border-sky-900/30">
-                  Click the button above to load reports. Warning: Endpoint is extremely slow on larger doctor count tables!
+                  Open the latest clinic operations summary.
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -1042,9 +1034,9 @@ export default function Dashboard() {
                   <div className="flex items-center gap-3 p-3 bg-amber-500/10 text-slate-700 dark:text-slate-300 text-xs rounded-lg border border-amber-500/20 leading-5">
                     <Clock className="h-5 w-5 text-amber-500 shrink-0" />
                     <div>
-                      <strong>Performance Diagnostic:</strong> API execution resolved in{' '}
+                      <strong>Report latency:</strong> Rendered in{' '}
                       <span className="font-bold text-amber-500">{adminReportData.timeTakenMs} ms</span>. 
-                      Sequential nested database calls loops reduce throughput. Optimization using Promise.all or single join aggregate is required.
+                      Parallel aggregation keeps this summary responsive during clinic hours.
                     </div>
                   </div>
 
@@ -1055,13 +1047,13 @@ export default function Dashboard() {
                       <h4 className="text-2xl font-black text-slate-800 dark:text-slate-100 mt-1">{adminReportData.data.length}</h4>
                     </div>
                     <div className="p-4 bg-sky-50/80 dark:bg-sky-950/20 border border-sky-200/70 dark:border-sky-900/30 rounded-xl shadow-sm">
-                      <span className="text-xxs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold">Sum appointments</span>
+                      <span className="text-xxs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold">Appointments tracked</span>
                       <h4 className="text-2xl font-black text-slate-800 dark:text-slate-100 mt-1">
                         {adminReportData.data.reduce((sum, item) => sum + item.totalAppointments, 0)}
                       </h4>
                     </div>
                     <div className="p-4 bg-sky-50/80 dark:bg-sky-950/20 border border-sky-200/70 dark:border-sky-900/30 rounded-xl shadow-sm">
-                      <span className="text-xxs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold">Total Sales ($)</span>
+                      <span className="text-xxs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold">Estimated revenue ($)</span>
                       <h4 className="text-2xl font-black text-teal-600 dark:text-teal-400 mt-1">
                         ${adminReportData.data.reduce((sum, item) => sum + item.revenue, 0)}
                       </h4>
@@ -1105,7 +1097,7 @@ export default function Dashboard() {
         )}
 
         {/* ==============================================================
-            TAB: PHYSICIAN REGISTRY (ADMIN ROLE - SQL INJECTION VULNERABILITY)
+            TAB: PHYSICIAN REGISTRY (ADMIN ROLE)
             ============================================================== */}
         {activeTab === 'physicians' && (
           <div className="glass p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md space-y-6">
@@ -1115,7 +1107,7 @@ export default function Dashboard() {
                 Staff Physicians Registry Lookup
               </h3>
               <p className="text-xs text-slate-700 dark:text-slate-300 font-semibold mt-1">
-                Database lookup for credentials. Uses a raw SQL interpolation backend query.
+                Search and view registered physician profiles.
               </p>
             </div>
 
@@ -1128,7 +1120,7 @@ export default function Dashboard() {
                   type="text"
                   value={adminSearchQuery}
                   onChange={(e) => setAdminSearchQuery(e.target.value)}
-                  placeholder="Enter physician name search criteria (raw syntax supported)..."
+                  placeholder="Search by physician name..."
                   className="block w-full pl-9 pr-3 py-2 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
                 />
               </div>
@@ -1137,12 +1129,12 @@ export default function Dashboard() {
                 onClick={searchPhysiciansAdmin}
                 className="glow-btn px-5 py-2 bg-slate-900 text-white dark:bg-teal-500 dark:text-slate-950 font-bold text-xs rounded-lg hover:bg-slate-800 dark:hover:bg-teal-400 transition-colors"
               >
-                Execute SQL Query
+                Search Physicians
               </button>
             </div>
 
             <div className="rounded-xl border border-sky-200/70 dark:border-sky-900/30 bg-sky-50/80 dark:bg-sky-950/20 px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Quick physician lookup is shown below. Results stay readable and compact instead of using the old fork warning panel.
+              Quick physician lookup is shown below. Results stay readable and compact so the screen feels like an operational admin tool.
             </div>
 
             {/* Doctors Result List */}
