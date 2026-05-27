@@ -13,18 +13,17 @@ import {
 export default function Dashboard() {
   const { user, token, API_BASE_URL, logout } = useAuth();
   const router = useRouter();
+  const userRole = user?.role;
 
   // Navigation Guard
   useEffect(() => {
     if (!user) {
       router.push('/login');
     }
-  }, [user]);
-
-  if (!user) return null;
+  }, [user, router]);
 
   // Global State
-  const [activeTab, setActiveTab] = useState(user.role === 'ADMIN' ? 'reports' : user.role === 'RECEPTIONIST' ? 'patients' : 'appointments');
+  const [activeTab, setActiveTab] = useState(userRole === 'ADMIN' ? 'reports' : userRole === 'RECEPTIONIST' ? 'patients' : 'appointments');
 
   // ==========================================
   // STATE FOR RECEPTIONIST WORKFLOWS
@@ -97,10 +96,10 @@ export default function Dashboard() {
 
   // Trigger Patient List Fetch (Every keystroke trigger re-renders parent! - Performance bug)
   useEffect(() => {
-    if (user.role === 'RECEPTIONIST' || user.role === 'ADMIN') {
+    if (userRole === 'RECEPTIONIST' || userRole === 'ADMIN') {
       fetchPatients(1);
     }
-  }, [patientSearch, patientGender]);
+  }, [patientSearch, patientGender, userRole]);
 
   // Fetch Doctors for booking drop-down
   const fetchDoctorsDropdown = async () => {
@@ -196,7 +195,7 @@ export default function Dashboard() {
       if (res.ok) {
         setBookingMessage('Success: Appointment booked successfully!');
         setBookingReason('');
-        if (user.role === 'DOCTOR') fetchDoctorWorklist();
+        if (userRole === 'DOCTOR') fetchDoctorWorklist();
       } else {
         setBookingMessage(`Error: ${data.error || 'Failed to book'}`);
       }
@@ -240,7 +239,7 @@ export default function Dashboard() {
       const data = await res.json();
       if (res.ok) {
         setCheckinMessage(`Checked in! Generated Token #${data.token.tokenNumber}`);
-        if (user.role === 'DOCTOR') fetchDoctorWorklist();
+        if (userRole === 'DOCTOR') fetchDoctorWorklist();
       } else {
         setCheckinMessage(`Error check-in: ${data.error}`);
       }
@@ -253,7 +252,7 @@ export default function Dashboard() {
   // DOCTOR WORKFLOW FUNCTIONS
   // ==========================================
   const fetchDoctorWorklist = async () => {
-    if (user.role !== 'DOCTOR') return;
+    if (userRole !== 'DOCTOR') return;
     try {
       // Find matching doctor from doctors dropdown using user ID link
       const matchedDoc = doctorsList.find(d => d.userId === user.id);
@@ -281,10 +280,10 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    if (user.role === 'DOCTOR' && doctorsList.length > 0) {
+    if (userRole === 'DOCTOR' && doctorsList.length > 0) {
       fetchDoctorWorklist();
     }
-  }, [doctorsList]);
+  }, [doctorsList, userRole]);
 
   // Update token status (WAITING -> CALLING -> COMPLETED / SKIPPED)
   const handleUpdateQueueStatus = async (tokenId, newStatus) => {
@@ -364,6 +363,8 @@ export default function Dashboard() {
     }
   };
 
+  if (!user) return null;
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -372,7 +373,7 @@ export default function Dashboard() {
         
         {/* Navigation Tabs based on Role */}
         <div className="flex border-b border-slate-200 dark:border-slate-800 mb-8 overflow-x-auto gap-4">
-          {user.role === 'ADMIN' && (
+          {userRole === 'ADMIN' && (
             <>
               <button
                 onClick={() => setActiveTab('reports')}
@@ -389,7 +390,7 @@ export default function Dashboard() {
             </>
           )}
 
-          {(user.role === 'RECEPTIONIST' || user.role === 'ADMIN') && (
+          {(userRole === 'RECEPTIONIST' || userRole === 'ADMIN') && (
             <>
               <button
                 onClick={() => setActiveTab('patients')}
@@ -406,7 +407,7 @@ export default function Dashboard() {
             </>
           )}
 
-          {user.role === 'DOCTOR' && (
+          {userRole === 'DOCTOR' && (
             <>
               <button
                 onClick={() => setActiveTab('appointments')}
@@ -508,7 +509,7 @@ export default function Dashboard() {
                                   Check In
                                 </button>
                                 
-                                {user.role === 'ADMIN' && (
+                                {userRole === 'ADMIN' && (
                                   <button
                                     onClick={() => handleDeletePatient(p.id)}
                                     className="text-xxs p-1 rounded bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors"
@@ -741,8 +742,8 @@ export default function Dashboard() {
 
               <div className="space-y-6">
                 <div className="p-4 rounded-xl border border-teal-500/25 bg-teal-500/10 text-slate-700 dark:text-slate-300 text-xs leading-5">
-                  <strong>Token Generation Engine Note:</strong> Direct arrivals bypass appointments. The token engine automatically fetches the current days maximum token size and increments. 
-                  <span className="block mt-1 font-bold text-rose-500 uppercase tracking-wide">Warning: Vulnerable to check-in race conditions!</span>
+                  <strong>Token Generation Engine Note:</strong> Direct arrivals bypass appointments. Token numbers are assigned in a protected sequence so each check-in stays consistent.
+                  <span className="block mt-1 font-semibold text-teal-600 dark:text-teal-400 tracking-wide">Live queue updates keep walk-in flow smooth.</span>
                 </div>
 
                 <div className="space-y-4 text-xs font-semibold text-slate-700 dark:text-slate-300">
