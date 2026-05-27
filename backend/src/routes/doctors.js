@@ -7,37 +7,32 @@ const prisma = new PrismaClient();
 
 // GET /api/doctors
 // Retrieve list of doctors with special search filtering
-// SECURITY BUG: SQL Injection vulnerability in the search parameter!
-// Uses queryRawUnsafe with string concatenation instead of parameterized inputs.
 router.get('/', authenticate, async (req, res) => {
   try {
     const { search, specialization } = req.query;
 
-    let query = 'SELECT * FROM "Doctor"';
-    const conditions = [];
+    const doctors = await prisma.doctor.findMany({
+      where: {
+        AND: [
+          search
+            ? {
+                name: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              }
+            : {},
+          specialization && specialization !== 'All'
+            ? { specialization }
+            : {},
+        ],
+      },
+      orderBy: { name: 'asc' },
+    });
 
-    if (search) {
-      // Direct string interpolation - VULNERABLE TO SQL INJECTION!
-      // Example exploit: search=House%' UNION SELECT id, email, password, name, role, '09:00', '17:00', 0, id FROM "User" --
-      conditions.push(`name ILIKE '%${search}%'`);
-    }
-
-    if (specialization && specialization !== 'All') {
-      conditions.push(`specialization = '${specialization}'`);
-    }
-
-    if (conditions.length > 0) {
-      query += ' WHERE ' + conditions.join(' AND ');
-    }
-
-    console.log(`[SQL-DEBUG] Executing Query: ${query}`);
-    const doctors = await prisma.$queryRawUnsafe(query);
-
-    // Inconsistent API formatting (directly sending array)
     res.json(doctors);
   } catch (error) {
-    // Leaks query syntax details to candidate/attacker
-    res.status(500).json({ error: 'Database execution failure', sqlMessage: error.message });
+    res.status(500).json({ error: 'Database execution failure' });
   }
 });
 

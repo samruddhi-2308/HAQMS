@@ -508,14 +508,15 @@ export default function Dashboard() {
                                   Check In
                                 </button>
                                 
-                                {/* Security flaw testing: Receptionist or doctor can delete since check is bypassed */}
-                                <button
-                                  onClick={() => handleDeletePatient(p.id)}
-                                  className="text-xxs p-1 rounded bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors"
-                                  title="Delete patient record"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </button>
+                                {user.role === 'ADMIN' && (
+                                  <button
+                                    onClick={() => handleDeletePatient(p.id)}
+                                    className="text-xxs p-1 rounded bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors"
+                                    title="Delete patient record"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
                               </td>
                             </tr>
                           ))}

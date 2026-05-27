@@ -5,6 +5,10 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config();
 
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET env variable is not set. Server cannot start.');
+}
+
 const authRoutes = require('./routes/auth');
 const patientRoutes = require('./routes/patients');
 const doctorRoutes = require('./routes/doctors');
@@ -52,7 +56,6 @@ app.use((err, req, res, next) => {
   res.status(500).json({
     message: 'An unexpected internal server error occurred!',
     error: err.message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
   });
 });
 
