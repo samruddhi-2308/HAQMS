@@ -105,12 +105,6 @@ npm run dev:frontend
 node make_doc.js
 ```
 
-## Submission Notes
-
-- The deployed backend should use the same PostgreSQL database that was migrated and seeded locally.
-- `NEXT_PUBLIC_API_URL` should point at the backend base URL, and the frontend will append `/api` automatically.
-- If you see an HTML response instead of JSON during login, the deployment or API base is wrong, not the client form.
-
 ## Project Story
 
 This repository was refined into a realistic demo of how a hospital queue system should look and behave under pressure: clean data, believable workflow, clear errors, and a deployable stack. The final result is meant to stand out in a review because it reads like a completed product, not just a code sample.
